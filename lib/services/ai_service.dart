@@ -4,7 +4,7 @@ import 'dart:convert';
 class AIService {
   static const String _baseUrl =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
-  static const String _apiKey = 'AIzaSyCYwMCpsKY4xudmp8fW4z9i1zmGPDd87Vw';
+  static const String _apiKey = '//Enter you GEMINIAPI KEY';
 
   static Future<String> getAIResponse(String message) async {
     try {
