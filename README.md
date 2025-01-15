@@ -22,7 +22,7 @@ EduAI is an Android-based educational app designed to revolutionize the learning
    ```
 2. Open the project in Android Studio.
 3. Run the app on an Android emulator or a physical device.
-
+After putting up the details in Signup Page, go to login Page and put the details to get logged in into the application.
 ---
 
 ## Inspiration
