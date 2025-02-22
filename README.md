@@ -18,7 +18,7 @@ EduAI is an Android-based educational app designed to revolutionize the learning
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/eduai.git
+   git clone https://github.com/Sagarika-Dubey/eduai.git
    ```
 2. Open the project in Android Studio.
 3. Run the app on an Android emulator or a physical device.
@@ -29,6 +29,7 @@ After putting up the details in Signup Page, Restart the application go to login
 ## Inspiration
 
 EduAI was inspired by the desire to make education more accessible and enjoyable. The rapid advancements in AI and its potential to personalize learning motivated the creation of this project.
+Here is the working demo: https://drive.google.com/file/d/18V2U3mP6TbVOkqP5IuOXbJDg1YQHB6S1/view
 
 ---
 
