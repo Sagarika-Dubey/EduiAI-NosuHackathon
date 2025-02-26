@@ -13,6 +13,9 @@ import 'screens/language_learning_screen.dart';
 import 'screens/flashcard_screen.dart';
 import 'widgets/math_solver.dart';
 import 'widgets/voice_assistant.dart';
+import 'models/assignment.dart';
+import 'screens/assignment_detail_screen.dart';
+import 'screens/assignments_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,6 +39,46 @@ class _HomePageState extends State<HomePage>
   late TabController _tabController;
   bool isDarkMode = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  double _buttonX = 20;
+  double _buttonY = 80;
+  final List<Assignment> pendingAssignments = [
+    Assignment(
+      id: '1',
+      subject: 'Mathematics',
+      title: 'Algebra Homework',
+      description: 'Complete the following problems',
+      dueDate: DateTime.now().add(Duration(days: 7)),
+      type: AssignmentType.homework,
+      priority: AssignmentPriority.high,
+      questions: [
+        AssignmentQuestion(
+          question: 'Solve: 2x + 5 = 15',
+          type: 'text',
+        ),
+        AssignmentQuestion(
+          question: 'What is the value of y²-4 when y=3?',
+          type: 'mcq',
+          options: ['5', '7', '9', '5'],
+        ),
+      ],
+    ),
+    Assignment(
+      id: '2',
+      subject: 'Physics',
+      title: 'Motion Project',
+      description: 'Create a presentation on types of motion',
+      dueDate: DateTime.now().add(Duration(days: 1)),
+      type: AssignmentType.project,
+      priority: AssignmentPriority.high,
+      questions: [
+        AssignmentQuestion(
+          question: 'Explain different types of motion with examples',
+          type: 'text',
+        ),
+      ],
+    ),
+    // Add more assignments
+  ];
 
   @override
   void initState() {
@@ -54,10 +97,10 @@ class _HomePageState extends State<HomePage>
       key: _scaffoldKey,
       appBar: _buildAppBar(),
       drawer: _buildDrawer(),
-      floatingActionButton: _buildFloatingActionButton(),
       body: Stack(
         children: [
           _buildBody(),
+          _buildFloatingActionButton(),
         ],
       ),
       bottomNavigationBar: _buildBottomNav(),
@@ -95,8 +138,32 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget _buildFloatingActionButton() {
-    return FloatingActionButton(
-      onPressed: () {
+    return Positioned(
+      left: _buttonX,
+      top: _buttonY,
+      child: Draggable(
+        feedback: _buildChatButton(),
+        childWhenDragging: Container(),
+        child: _buildChatButton(),
+        onDragEnd: (details) {
+          setState(() {
+            final renderBox = context.findRenderObject() as RenderBox;
+            final offset = renderBox.globalToLocal(details.offset);
+
+            _buttonX = offset.dx - 30;
+            _buttonY = offset.dy - 30;
+
+            _buttonX = _buttonX.clamp(0.0, renderBox.size.width - 60);
+            _buttonY = _buttonY.clamp(0.0, renderBox.size.height - 60);
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildChatButton() {
+    return GestureDetector(
+      onTap: () {
         showDialog(
           context: context,
           builder: (context) => Dialog(
@@ -129,7 +196,7 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget _buildBody() {
-    switch (_tabController.index) {
+    switch (_selectedIndex) {
       case 0:
         return _buildHomeContent();
       case 1:
@@ -195,7 +262,7 @@ class _HomePageState extends State<HomePage>
             },
           ),
           SizedBox(height: 24),
-          _buildAssignmentsSection(),
+          _buildPendingAssignments(),
         ],
       ),
     );
@@ -312,83 +379,136 @@ class _HomePageState extends State<HomePage>
     return gradients[index % gradients.length];
   }
 
-  Widget _buildAssignmentsSection() {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Pending Assignments',
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ).animate().fadeIn().slideX(),
-        SizedBox(height: 16),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: 2,
-          itemBuilder: (context, index) {
-            return Container(
-              margin: EdgeInsets.only(bottom: 16),
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.shadowColor.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: Offset(0, 5),
-                  ),
-                ],
-              ),
+  Widget _buildPendingAssignments() {
+    final sortedAssignments = List<Assignment>.from(pendingAssignments)
+      ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
+
+    return Card(
+      margin: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.orange.shade300,
-                          Colors.orange.shade500
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Icon(Icons.assignment, color: Colors.white),
-                  ),
-                  SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Assignment ${index + 1}',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Due in 2 days',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.7),
-                          ),
-                        ),
-                      ],
+                  Text(
+                    'Pending Assignments',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Icon(
-                    Icons.chevron_right,
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                  SizedBox(width: 16),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AssignmentsScreen(
+                            assignments: pendingAssignments,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text('View All'),
                   ),
                 ],
               ),
-            ).animate().fadeIn(delay: (index * 200).ms).slideX();
-          },
+            ),
+          ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: math.min(sortedAssignments.length, 3),
+            itemBuilder: (context, index) {
+              final assignment = sortedAssignments[index];
+              return ListTile(
+                leading: _buildAssignmentTypeIcon(assignment.type),
+                title: Text(assignment.title),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Due: ${assignment.dueDate.toString().split(' ')[0]}'),
+                    _buildStatusChip(assignment.status),
+                  ],
+                ),
+                trailing: _buildPriorityIndicator(assignment.priority),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AssignmentDetailScreen(
+                        assignment: assignment,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
+    ).animate().fadeIn().slideX();
+  }
+
+  Widget _buildAssignmentTypeIcon(AssignmentType type) {
+    final iconData = {
+      AssignmentType.homework: Icons.assignment,
+      AssignmentType.project: Icons.science_outlined,
+      AssignmentType.essay: Icons.edit_note,
+      AssignmentType.quiz: Icons.quiz,
+      AssignmentType.lab: Icons.biotech,
+    }[type];
+
+    return CircleAvatar(
+      backgroundColor: Colors.blue.withOpacity(0.1),
+      child: Icon(iconData ?? Icons.assignment, color: Colors.blue),
+    );
+  }
+
+  Widget _buildStatusChip(AssignmentStatus status) {
+    final statusData = {
+      AssignmentStatus.pending: (Colors.grey, 'Pending'),
+      AssignmentStatus.overdue: (Colors.red, 'Overdue'),
+      AssignmentStatus.dueSoon: (Colors.orange, 'Due Soon'),
+      AssignmentStatus.completed: (Colors.green, 'Completed'),
+    }[status]!;
+
+    return Container(
+      margin: EdgeInsets.only(top: 4),
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: statusData.$1.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        statusData.$2,
+        style: TextStyle(
+          color: statusData.$1,
+          fontSize: 12,
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildPriorityIndicator(AssignmentPriority priority) {
+    final color = {
+      AssignmentPriority.low: Colors.green,
+      AssignmentPriority.medium: Colors.orange,
+      AssignmentPriority.high: Colors.red,
+    }[priority]!;
+
+    return Container(
+      width: 4,
+      height: 36,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(2),
+      ),
     );
   }
 
@@ -605,7 +725,9 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget _buildAIFeatures() {
-    return Column(
+    return ListView(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       children: [
         MathSolver(),
         SizedBox(height: 16),

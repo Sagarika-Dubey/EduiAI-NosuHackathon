@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../services/download_service.dart';
 import 'package:open_file/open_file.dart';
+import '../services/syllabus_based_ai_service.dart';
+import 'quiz_screen.dart';
+import '../models/quiz_question.dart';
 
 class SyllabusScreen extends StatefulWidget {
   const SyllabusScreen({super.key});
@@ -183,6 +186,42 @@ class _SyllabusScreenState extends State<SyllabusScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _startTopicQuiz(String subject, Map<String, dynamic> unit) {
+    final questionsMap = SyllabusBasedAIService.generateQuestionsFromSyllabus(
+      subject,
+      [unit],
+      'medium',
+    );
+
+    final questions = questionsMap
+        .map((q) => QuizQuestion(
+              subject: subject,
+              question: q['question'],
+              options: List<String>.from(q['options']),
+              correctAnswer: q['correct'],
+              explanation: q['explanation'],
+              difficulty: q['difficulty'],
+            ))
+        .toList();
+
+    if (questions.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No questions available for this topic')),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QuizScreen(
+          subject: subject,
+          questions: questions,
+        ),
       ),
     );
   }

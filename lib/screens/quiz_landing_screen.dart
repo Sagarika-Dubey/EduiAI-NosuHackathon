@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'quiz_screen.dart';
+import '../services/quiz_service.dart';
 
 class QuizLandingScreen extends StatelessWidget {
   final List<Map<String, dynamic>> subjects = [
@@ -60,7 +61,11 @@ class QuizLandingScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => QuizScreen(subject: subject['name']),
+                  builder: (context) => QuizScreen(
+                    subject: subject['name'],
+                    questions:
+                        QuizService.getQuestionsBySubject(subject['name']),
+                  ),
                 ),
               );
             },

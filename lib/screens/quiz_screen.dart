@@ -9,10 +9,12 @@ import '../widgets/progress_tracker.dart';
 
 class QuizScreen extends StatefulWidget {
   final String subject;
+  final List<QuizQuestion> questions;
 
   const QuizScreen({
     super.key,
     required this.subject,
+    required this.questions,
   });
 
   @override
