@@ -29,7 +29,8 @@ After putting up the details in Signup Page, Restart the application go to login
 ## Inspiration
 
 EduAI was inspired by the desire to make education more accessible and enjoyable. The rapid advancements in AI and its potential to personalize learning motivated the creation of this project.
-Here is the working demo: https://drive.google.com/file/d/18V2U3mP6TbVOkqP5IuOXbJDg1YQHB6S1/view
+[Working Demo](https://drive.google.com/file/d/18V2U3mP6TbVOkqP5IuOXbJDg1YQHB6S1/view)
+
 
 ---
 
